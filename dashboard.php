@@ -62,37 +62,7 @@ if (isset($_POST['logout'])) {
 
 // Add new user
 // Get user input
-if (isset($_POST['create'])) {
-$username = $_POST['newuser'];
-$password = $_POST['newpass'];
-$confirm_password = $_POST['confirmpass'];
 
-// Check if the user already exists
-$sql = "SELECT * FROM users WHERE username = '$username'";
-  $result = $conn->query($sql);
-
-  if ($result->num_rows > 0) {
-    // The username already exists
-    echo "Username already exists!!!";
-  } else {
-    // The username does not exist, so add the user to the database
-    if ($password == $confirm_password) {
-      // The passwords match, so insert the user into the database
-      $sql = "INSERT INTO users (username, password) VALUES ('$username', '$password')";
-      if ($conn->query($sql) === TRUE) {
-        echo "User created successfully!!!";
-      } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
-      }
-    } else {
-      // The passwords do not match
-      echo "Passwords do not match!!!";
-    }
-  }
-
-  // Close the database connection
-  $conn->close();
-}
 ?>
 
 <!DOCTYPE html>
@@ -140,21 +110,6 @@ $sql = "SELECT * FROM users WHERE username = '$username'";
             <input type="password" name="confirm_password"><br>
 
             <input class="nav-link btn btn-success text-light"type="submit" name="change_password" value="Change Password">
-        </form>
-  </div>
-  <div class="container mt-5">
-    <h3>Create New User</h3>
-        <form method="post" action="dashboard.php">
-            <label>Username</label>
-            <input type="text" name="newuser"><br>
-
-            <label>Password:</label>
-            <input type="password" name="newpass"><br>
-
-            <label>Confirm Password:</label>
-            <input type="password" name="confirmpass"><br>
-
-            <input class="nav-link btn btn-success text-light"type="submit" name="create" value="Create New Password">
         </form>
   </div>
 
