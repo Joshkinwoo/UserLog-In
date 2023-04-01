@@ -28,7 +28,7 @@ if(isset($_POST['login'])) {
         $_SESSION['username'] = $email;
         header("Location: dashboard.php"); // Redirect to dashboard after successful login
     } else {
-        echo "Invalid email or password";
+        echo "Invalid email or password.";
     }
 }
 

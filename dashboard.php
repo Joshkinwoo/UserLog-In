@@ -16,21 +16,36 @@ if (!$conn) {
 
 // Password change functionality
 if(isset($_POST['change_password'])) {
-  $email = mysqli_real_escape_string($conn, $_SESSION['username']);
-  $current_password = mysqli_real_escape_string($conn, $_POST['current_password']);
-  $new_password = mysqli_real_escape_string($conn, $_POST['new_password']);
-  
-  $sql = "SELECT * FROM users WHERE username='$email' AND password='$current_password'";
-  $result = mysqli_query($conn, $sql);
-  $count = mysqli_num_rows($result);
-  
-  if($count == 1) {
-      $sql = "UPDATE users SET password='$new_password' WHERE username='$email'";
-      mysqli_query($conn, $sql);
-      echo "<p style='color: red;'>Password changed successfully!!!</p>";
+  $username = mysqli_real_escape_string($conn, $_SESSION['username']);
+  $old_password = $_POST['current_password'];
+  $new_password = $_POST['new_password'];
+  $confirm_password = $_POST['confirm_password'];
+
+  // Check if the old password is correct
+  $sql = "SELECT * FROM users WHERE username = '$username' AND password = '$old_password'";
+  $result = $conn->query($sql);
+
+  if ($result->num_rows > 0) {
+    // The old password is correct
+    if ($new_password == $confirm_password) {
+      // The new passwords match, so update the user's password in the database
+      $sql = "UPDATE users SET password = '$new_password' WHERE username = '$username'";
+      if ($conn->query($sql) === TRUE) {
+        echo "Password changed successfully!!!";
+      } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+      }
+    } else {
+      // The new passwords do not match
+      echo "New passwords do not match!!!";
+    }
   } else {
-      echo "<p style='color: red;'>Invalid current password!!!</p>";
+    // The old password is incorrect
+    echo "Current password is incorrect!!!";
   }
+
+  // Close the database connection
+  $conn->close();
 }
 
 
@@ -41,8 +56,42 @@ if (isset($_POST['logout'])) {
     session_destroy();
 
     // Redirect to login page
-    header("Location: index.php");
+    header("Location: userlogin.php");
     exit();
+}
+
+// Add new user
+// Get user input
+if (isset($_POST['create'])) {
+$username = $_POST['newuser'];
+$password = $_POST['newpass'];
+$confirm_password = $_POST['confirmpass'];
+
+// Check if the user already exists
+$sql = "SELECT * FROM users WHERE username = '$username'";
+  $result = $conn->query($sql);
+
+  if ($result->num_rows > 0) {
+    // The username already exists
+    echo "Username already exists!!!";
+  } else {
+    // The username does not exist, so add the user to the database
+    if ($password == $confirm_password) {
+      // The passwords match, so insert the user into the database
+      $sql = "INSERT INTO users (username, password) VALUES ('$username', '$password')";
+      if ($conn->query($sql) === TRUE) {
+        echo "User created successfully!!!";
+      } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+      }
+    } else {
+      // The passwords do not match
+      echo "Passwords do not match!!!";
+    }
+  }
+
+  // Close the database connection
+  $conn->close();
 }
 ?>
 
@@ -91,6 +140,21 @@ if (isset($_POST['logout'])) {
             <input type="password" name="confirm_password"><br>
 
             <input class="nav-link btn btn-success text-light"type="submit" name="change_password" value="Change Password">
+        </form>
+  </div>
+  <div class="container mt-5">
+    <h3>Create New User</h3>
+        <form method="post" action="dashboard.php">
+            <label>Username</label>
+            <input type="text" name="newuser"><br>
+
+            <label>Password:</label>
+            <input type="password" name="newpass"><br>
+
+            <label>Confirm Password:</label>
+            <input type="password" name="confirmpass"><br>
+
+            <input class="nav-link btn btn-success text-light"type="submit" name="create" value="Create New Password">
         </form>
   </div>
 
